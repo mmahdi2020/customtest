@@ -7,7 +7,7 @@ on:
         description: "لینک ویدئو را وارد کنید"
         required: true
       quality:
-        description: "کیفیت مورد نظر (144 یا 240)"
+        description: "کیفیت موردنظر (144 یا 240)"
         required: true
         default: "240"
 
@@ -16,8 +16,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Install yt-dlp and ffmpeg
         run: |
@@ -29,7 +29,7 @@ jobs:
 
       - name: Download video
         run: |
-          Q=${{ github.event.inputs.quality }}
+          Q="${{ github.event.inputs.quality }}"
           URL="${{ github.event.inputs.url }}"
 
           if [ "$Q" = "144" ]; then
@@ -40,7 +40,7 @@ jobs:
 
           yt-dlp -f "$FORMAT" -o "video.%(ext)s" "$URL"
 
-      - name: Upload output
+      - name: Upload downloaded video
         uses: actions/upload-artifact@v4
         with:
           name: downloaded-video
