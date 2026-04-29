@@ -7,7 +7,7 @@ on:
         description: "لینک ویدئو را وارد کنید"
         required: true
       quality:
-        description: "کیفیت موردنظر (144 یا 240)"
+        description: "کیفیت (144 یا 240)"
         required: true
         default: "240"
 
@@ -27,9 +27,12 @@ jobs:
             -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
-      - name: Download video
+      - name: Prepare cookies
         run: |
           echo "${{ secrets.YT_COOKIES }}" > cookies.txt
+
+      - name: Download video
+        run: |
           Q="${{ github.event.inputs.quality }}"
           URL="${{ github.event.inputs.url }}"
 
@@ -41,8 +44,8 @@ jobs:
 
           yt-dlp --cookies cookies.txt -f "$FORMAT" -o "video.%(ext)s" "$URL"
 
-      - name: Upload downloaded video
+      - name: Upload video
         uses: actions/upload-artifact@v4
         with:
-          name: downloaded-video
+          name: video
           path: video.*
