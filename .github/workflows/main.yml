@@ -29,6 +29,7 @@ jobs:
 
       - name: Download video
         run: |
+          echo "${{ secrets.YT_COOKIES }}" > cookies.txt
           Q="${{ github.event.inputs.quality }}"
           URL="${{ github.event.inputs.url }}"
 
@@ -38,7 +39,7 @@ jobs:
             FORMAT='bestvideo[height<=240]+bestaudio/best[height<=240]'
           fi
 
-          yt-dlp -f "$FORMAT" -o "video.%(ext)s" "$URL"
+          yt-dlp --cookies cookies.txt -f "$FORMAT" -o "video.%(ext)s" "$URL"
 
       - name: Upload downloaded video
         uses: actions/upload-artifact@v4
