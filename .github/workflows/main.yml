@@ -1,0 +1,47 @@
+name: Video Downloader
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "لینک ویدئو را وارد کنید"
+        required: true
+      quality:
+        description: "کیفیت مورد نظر (144 یا 240)"
+        required: true
+        default: "240"
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+      - uses: actions/checkout@v4
+
+      - name: Install yt-dlp and ffmpeg
+        run: |
+          sudo apt update
+          sudo apt install -y ffmpeg
+          sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
+            -o /usr/local/bin/yt-dlp
+          sudo chmod a+rx /usr/local/bin/yt-dlp
+
+      - name: Download video
+        run: |
+          Q=${{ github.event.inputs.quality }}
+          URL="${{ github.event.inputs.url }}"
+
+          if [ "$Q" = "144" ]; then
+            FORMAT='bestvideo[height<=144]+bestaudio/best[height<=144]'
+          else
+            FORMAT='bestvideo[height<=240]+bestaudio/best[height<=240]'
+          fi
+
+          yt-dlp -f "$FORMAT" -o "video.%(ext)s" "$URL"
+
+      - name: Upload output
+        uses: actions/upload-artifact@v4
+        with:
+          name: downloaded-video
+          path: video.*
